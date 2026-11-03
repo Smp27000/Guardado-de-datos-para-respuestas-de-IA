@@ -1,2 +1,10 @@
-FolderTXT/
+# Dependencias
 node_modules/
+
+# Variables de entorno y credenciales
+.env
+
+# Archivos generados dinámicamente
+data/
+descripciones/
+imagenes/
