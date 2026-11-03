@@ -1,3 +1,7 @@
+## ¿Use IA?
+
+si, use angravity y gemini 3.8 flash low para generar el codigo
+
 ## Prompt usado con Antigraty (Gemini 3.8 Flash Low)
 
 Actúa como un instructor de Node.js para principiantes del SENA.
