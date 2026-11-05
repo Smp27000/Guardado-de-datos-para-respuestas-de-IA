@@ -21,10 +21,10 @@ El archivo de la imagen se corrompería y no podría abrirse. La codificación `
 ---
 
 ### 5. ¿Qué pasos consumen cuota gratuita y cómo evitaste repetirlos?
-Consumen cuota las llamadas HTTP a la API de NVIDIA: la generación de la descripción (`chat/completions`) y la generación de la imagen (`flux.1-schnell`). Se evitaron usando la función nativa `fs.existsSync`: si el archivo `descripciones/mundo_<id>.txt` o `imagenes/mundo_<id>.jpg` ya existe en el disco, se lee o se omite la llamada a la API.
+Consumen cuota las llamadas HTTP a la API de NVIDIA para la generación de la descripción de texto (`chat/completions`) y el uso de recursos de red en el generador de imágenes (Pollinations.ai / FLUX). Se evitaron usando la función nativa `fs.existsSync`: si el archivo `descripciones/mundo_<id>.txt` o `imagenes/mundo_<id>.jpg` ya existe en el disco, se lee o se omite la llamada a la red.
 
 ---
 
 ### 6. Si usaste IA: ¿qué fue lo más difícil de pedirle y qué parte tuviste que corregir tú?
-Lo más difícil fue que generara un prompt visual conciso y adaptado a las limitaciones de tiempo del modelo de imágenes, ya que inicialmente producía textos demasiado largos que causaban error 504 (timeout en NVIDIA). Tuve que corregir la longitud del prompt a un formato corto (máximo 50 palabras), arreglar las rutas de importación de los archivos y limpiar las variables del archivo `.env`.
+Lo más difícil fue resolver los fallos de saturación en la API de NVIDIA para imágenes (error 504 Gateway Timeout por cold-start en los servidores remotos). Tuve que corregir la arquitectura pasando la generación de imágenes al servicio gratuito y directo de Pollinations.ai (que entrega los bytes limpios mediante `arrayBuffer`), limpiar el formato del archivo `.env` y asegurar la idempotencia del hash.
 

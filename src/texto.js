@@ -20,7 +20,7 @@ async function generarDescripcion(datosMundo) {
   }
 
   // paso 6: Preparamos el prompt que describe la escena con los colores
-  const prompt = `Describe detalladamente en inglés una escena visual para generar una imagen. Mundo: ${datosMundo.mundo}. Situación: ${datosMundo.situacion}. Paleta de colores obligatoria: ${datosMundo.colores.join(', ')}.`;
+  const prompt = `Write a short visual prompt (maximum 40 words) in English for an image generator. Scene: ${datosMundo.situacion} in ${datosMundo.mundo}. Required color palette: ${datosMundo.colores.join(', ')}. Return ONLY the descriptive prompt without titles or markdown.`;
 
   // paso 7: Hacemos la petición HTTP POST a la API de NVIDIA usando fetch
   try {
@@ -31,7 +31,7 @@ async function generarDescripcion(datosMundo) {
         'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-20b',
+        model: 'meta/llama-3.2-90b-vision-instruct',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7
       })
@@ -49,7 +49,7 @@ async function generarDescripcion(datosMundo) {
   } catch (error) {
     // paso 10: Capturamos cualquier error en la llamada
     console.log('Error al generar la descripción de texto:', error.message);
-    process.exit(1);
+    throw error;
   }
 }
 

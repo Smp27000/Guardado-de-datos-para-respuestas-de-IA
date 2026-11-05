@@ -89,8 +89,8 @@ Ambos servicios utilizan la misma API Key gratuita provista por la plataforma de
    - **Propósito:** Generar una descripción visual y artística en inglés optimizada para generación de imágenes respetando la paleta de colores.
 
 2. **Modelo Generador de Imágenes**:
-   - **Modelo:** `black-forest-labs/flux.1-schnell`
-   - **Endpoint:** `https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell`
-   - **Enlace:** [NVIDIA Build - FLUX.1-schnell](https://build.nvidia.com/black-forest-labs/flux-1-schnell)
-   - **Propósito:** Generar la imagen digital a partir del prompt descriptivo en formato Base64 para su posterior guardado como archivo `.jpg`.
+   - **Servicio:** `Pollinations.ai` (text-to-image gratuito)
+   - **Endpoint:** `https://image.pollinations.ai/prompt/<PROMPT>?width=1024&height=1024&nologo=true`
+   - **Enlace:** [Pollinations.ai](https://pollinations.ai/)
+   - **Propósito:** Generar la imagen digital a partir de la descripción visual y descargar el archivo binario directo para guardarlo como `.jpg` (sustituye a FLUX por saturación y timeouts 504 en NVIDIA NIM).
 

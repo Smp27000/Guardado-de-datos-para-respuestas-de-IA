@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // paso 2: Función asíncrona para generar y guardar la imagen
-async function generarImagen(id, descripcion, reintentos = 3) {
+async function generarImagen(id, descripcion) {
   // paso 3: Configuramos la carpeta 'imagenes' y la ruta del archivo destino
   const carpetaImagenes = path.join(__dirname, '..', 'imagenes');
   const rutaArchivo = path.join(carpetaImagenes, `mundo_${id}.jpg`);
@@ -19,51 +19,34 @@ async function generarImagen(id, descripcion, reintentos = 3) {
     return rutaArchivo;
   }
 
-  // paso 6: Realizamos la petición a la API con control de reintentos
-  console.log(`[Imagen] Solicitando imagen a NVIDIA FLUX (intentos restantes: ${reintentos})...`);
-
+  // paso 6: Realizamos la petición GET al servicio gratuito de Pollinations.ai
+  console.log('[Imagen] Generando imagen con Pollinations.ai...');
   try {
-    const respuesta = await fetch('https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`
-      },
-      body: JSON.stringify({
-        prompt: descripcion
-      })
-    });
+    // Tomamos los primeros 250 caracteres para un prompt ágil y conciso
+    const promptCorto = descripcion.replace(/\n+/g, ' ').slice(0, 250);
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptCorto)}?width=1024&height=1024&nologo=true`;
+    const respuesta = await fetch(url);
 
-    // paso 7: Si hay error 504 (timeout del servidor) y quedan intentos, esperamos y reintentamos
-    if (respuesta.status === 504 && reintentos > 1) {
-      console.log('[Imagen] Servidor de NVIDIA saturado (504). Reintentando en 5 segundos...');
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      return await generarImagen(id, descripcion, reintentos - 1);
-    }
-
-    // paso 8: Validamos si la respuesta final fue exitosa
+    // paso 7: Validamos que la respuesta HTTP sea correcta
     if (!respuesta.ok) {
-      const errorTexto = await respuesta.text();
-      throw new Error(`Error en la API de NVIDIA (${respuesta.status}): ${errorTexto}`);
+      throw new Error(`Error en la API de imágenes (${respuesta.status}): ${respuesta.statusText}`);
     }
 
-    // paso 9: Parseamos el JSON y extraemos la imagen en base64
-    const datos = await respuesta.json();
-    const base64Data = datos.artifacts[0].base64;
+    // paso 8: Obtenemos los bytes de la imagen directamente como ArrayBuffer
+    const arrayBuffer = await respuesta.arrayBuffer();
 
-    // paso 10: Convertimos el base64 a archivo binario .jpg
-    const bufferImagen = Buffer.from(base64Data, 'base64');
+    // paso 9: Convertimos el ArrayBuffer a Buffer binario de Node.js y guardamos el .jpg
+    const bufferImagen = Buffer.from(arrayBuffer);
     fs.writeFileSync(rutaArchivo, bufferImagen);
 
     console.log(`[Imagen] Imagen guardada en: imagenes/mundo_${id}.jpg`);
     return rutaArchivo;
   } catch (error) {
-    // paso 11: Mostramos el mensaje y propagamos el error
-    console.log('Error en generarImagen:', error.message);
+    // paso 10: Capturamos cualquier error en la descarga
+    console.log('Error al generar la imagen:', error.message);
     throw error;
   }
 }
 
-// paso 12: Exportamos la función
+// paso 11: Exportamos la función
 module.exports = { generarImagen };
